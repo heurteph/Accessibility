@@ -42,6 +42,7 @@ float fade;
 int shortVibrationDuration;
 int mediumVibrationDuration;
 int longVibrationDuration;
+int extraVibrationDuration;
 
 /* Set the screen dimensions */
 void settings()
@@ -82,6 +83,7 @@ void setup()
   shortVibrationDuration  = 250;  // ms
   mediumVibrationDuration = 500;  // ms
   longVibrationDuration   = 1000; // ms
+  extraVibrationDuration  = 4000; // ms
   
   font = createFont("soria-font.ttf", 100);
   textFont(font);
@@ -218,6 +220,8 @@ void CheckForVictory()
   }
   victory = true;
   isFading = true;
+  
+  giveExtraVibration();
 }
 
 void displayEndMessage()
@@ -320,6 +324,11 @@ void giveMediumVibration()
 void giveLongVibration()
 {
   outputVibration(longVibrationDuration);
+}
+
+void giveExtraVibration()
+{
+  outputVibration(extraVibrationDuration);
 }
 
 void outputVibration(int duration)

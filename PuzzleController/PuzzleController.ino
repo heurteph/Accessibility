@@ -85,11 +85,7 @@ void loop() {
   }
 
   /* vibrations */
-  int t = Serial.parseInt(); // receive duration from Processing
-  if(t != 0)
-  {
-    vibrationTimer = t;
-  }
+
   if(vibrationTimer > 0)
   {
     vibrationTimer = max(vibrationTimer - (millis() - lastMillis), 0);
@@ -97,6 +93,14 @@ void loop() {
       digitalWrite(vibrationPin, LOW);
     else
       digitalWrite(vibrationPin, HIGH);
+  }
+  else
+  {
+      int t = Serial.parseInt(); // receive duration from Processing, do not load them during occuring vibration
+      if(t != 0)
+      {
+        vibrationTimer = t;
+      }
   }
   lastMillis = millis();
   
