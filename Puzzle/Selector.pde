@@ -33,26 +33,51 @@ class Selector
   
   public void moveUp()
   {
-    nextPos = (currentPos - divHorizontal >= 0) ? currentPos - divHorizontal : currentPos;
-    isTransitioning = true;
+    //nextPos = (currentPos - divHorizontal >= 0) ? currentPos - divHorizontal : currentPos;
+    //isTransitioning = true;
+    
+    if(currentPos - divHorizontal >= 0)
+    {
+      nextPos = currentPos - divHorizontal;
+      isTransitioning = true;
+      
+    }
   }
   
   public void moveDown()
   {
-    nextPos = (currentPos + divHorizontal < divHorizontal * divVertical) ? currentPos + divHorizontal : currentPos;
-    isTransitioning = true;
+    //nextPos = (currentPos + divHorizontal < divHorizontal * divVertical) ? currentPos + divHorizontal : currentPos;
+    //isTransitioning = true;
+    
+    if(currentPos + divHorizontal < divHorizontal * divVertical)
+    {
+      nextPos = currentPos + divHorizontal;
+      isTransitioning = true;
+    }
   }
   
   public void moveLeft()
   {
-    nextPos = (currentPos % divHorizontal > 0) ? currentPos - 1 : currentPos;
-    isTransitioning = true;
+    //nextPos = (currentPos % divHorizontal > 0) ? currentPos - 1 : currentPos;
+    //isTransitioning = true;
+    
+    if(currentPos % divHorizontal > 0)
+    {
+      nextPos = currentPos - 1;
+      isTransitioning = true;
+    }
   }
   
   public void moveRight()
   {
-    nextPos = (currentPos % divHorizontal < divHorizontal - 1) ? currentPos + 1 : currentPos;
-    isTransitioning = true;
+    //nextPos = (currentPos % divHorizontal < divHorizontal - 1) ? currentPos + 1 : currentPos;
+    //isTransitioning = true;
+    
+    if(currentPos % divHorizontal < divHorizontal - 1)
+    {
+      nextPos = currentPos + 1;
+      isTransitioning = true;
+    }
   }
   
   public void command()
