@@ -1,5 +1,9 @@
+int puzzleWidth, puzzleHeight;
 int divHorizontal, divVertical, divTotal;
 int wPiece, hPiece;
+int backgroundWidth, backgroundHeight;
+int marginWidth, marginHeight;
+
 String path, extension;
 String inputs;
 
@@ -9,6 +13,7 @@ String[] puzzles;
 Piece[] pieces;
 Selector selector;
 PImage[] fullPictures;
+PImage background;
 
 boolean isAnimating;
 float animationSpeed;
@@ -36,7 +41,9 @@ float fade;
 /* Set the screen dimensions */
 void settings()
 {
-  size(640, 480);
+  // background = loadImage("images\\background.png");
+  // make sure the background is wider and higher than the puzzle
+  size(1200, 1000);
 }
 
 void setup()
@@ -51,8 +58,6 @@ void setup()
   divHorizontal = 4;
   divVertical = 3;
   divTotal = divHorizontal * divVertical;
-  wPiece = width / divHorizontal;
-  hPiece = height / divVertical;
   
   animationSpeed = 5;
   animationAcceleration = -1;
@@ -130,7 +135,7 @@ void draw()
       imageMode(CENTER);
       
       pushMatrix();
-        translate(x + wPiece * 0.5, y + hPiece * 0.5);
+        translate(marginWidth + x + wPiece * 0.5, marginHeight + y + hPiece * 0.5);
         
         //noStroke();
         fill(0,0,0);
@@ -162,7 +167,7 @@ void draw()
     imageMode(CENTER);
       
     pushMatrix();
-        translate((selector.getCurrentPos() % divHorizontal) * wPiece + wPiece * 0.5, (selector.getCurrentPos() / divHorizontal) * hPiece  + hPiece * 0.5);
+        translate(marginWidth + (selector.getCurrentPos() % divHorizontal) * wPiece + wPiece * 0.5, marginHeight + (selector.getCurrentPos() / divHorizontal) * hPiece  + hPiece * 0.5);
         scale(pieces[selector.getCurrentPos()].getScale());
         rotate(radians(pieces[selector.getCurrentPos()].getAngle()));
         fill(0,0,0,64);
@@ -226,7 +231,7 @@ void displayVictory()
   pushMatrix();
           translate(width / 2.0, height / 2.0);
           scale(fullPictureScale);
-          image(fullPictures[1], 0, 0, width, height);
+          image(fullPictures[1], 0, 0, puzzleWidth, puzzleHeight);
           tint(255, fade);
   popMatrix();
 }
@@ -265,7 +270,15 @@ void restartGame(int number)
   victory = false;
   isAnimating = false;
   isTransitioning = false;
+  
   selectPuzzle(number);
+  puzzleWidth = fullPictures[number].width;
+  puzzleHeight = fullPictures[number].height;
+  wPiece = puzzleWidth / divHorizontal;
+  hPiece = puzzleHeight / divVertical;
+  marginWidth = (backgroundWidth - puzzleWidth) / 2;
+  marginHeight = (backgroundHeight - puzzleHeight) / 2;
+  
   selector = new Selector("images\\selection.png", divHorizontal, divVertical);
   glow = glowMax;
   glowDir = -1;
