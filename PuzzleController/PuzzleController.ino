@@ -1,8 +1,11 @@
-int buttonPin              = 8;
+const int buttonPin        = 8;
 const int joystickRightPin = 2;
 const int joystickLeftPin  = 3;
 const int joystickDownPin  = 4;
 const int joystickUpPin    = 5;
+
+const int vibrationPin     = 9;
+unsigned long vibrationTimer = 0;
 
 /* button vars */
 
@@ -16,6 +19,9 @@ int yJoystickTrigger = 0;
 unsigned long joystickTimer = millis();
 unsigned long joystickDelay = 500; // milliseconds
 
+/* vibration vars */
+unsigned long lastMillis;
+
 void setup() {
   
   pinMode(buttonPin, INPUT_PULLUP);
@@ -23,6 +29,9 @@ void setup() {
   pinMode(joystickDownPin, INPUT);
   pinMode(joystickLeftPin, INPUT);
   pinMode(joystickRightPin, INPUT);
+  pinMode(vibrationPin, OUTPUT);
+
+  lastMillis = millis();
   
   Serial.begin(9600);
 }
@@ -74,6 +83,22 @@ void loop() {
       joystickTimer = millis();
     }
   }
+
+  /* vibrations */
+  int t = Serial.parseInt(); // receive duration from Processing
+  if(t != 0)
+  {
+    vibrationTimer = t;
+  }
+  if(vibrationTimer > 0)
+  {
+    vibrationTimer = max(vibrationTimer - (millis() - lastMillis), 0);
+    if(vibrationTimer <= 0)
+      digitalWrite(vibrationPin, LOW);
+    else
+      digitalWrite(vibrationPin, HIGH);
+  }
+  lastMillis = millis();
   
   String s1 = "{\"joystickX\": ";
   String s2 = (String)xJoystickTrigger;

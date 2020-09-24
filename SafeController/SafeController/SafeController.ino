@@ -95,6 +95,8 @@ int getCurrentNumberOnLock(int index)
 void resetGame()
 {
   openSafe(); // in case the user missed the opportunity to close the door
+
+  delay(5000); // 5 seconds to get ready
   
   closeSafe();
   isCodeFound = false;

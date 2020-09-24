@@ -15,6 +15,11 @@ void setupSerial()
   inputs = readSerial(); // purge data before starting
 }
 
+void writeSerial(int value)
+{
+  port.write(value);
+}
+
 String readSerial()
 {
   if(port.available() > 0) 

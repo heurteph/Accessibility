@@ -39,6 +39,10 @@ boolean isFading;
 float fadingSpeed;
 float fade;
 
+int shortVibrationDuration;
+int mediumVibrationDuration;
+int longVibrationDuration;
+
 /* Set the screen dimensions */
 void settings()
 {
@@ -46,7 +50,7 @@ void settings()
   // backgroundWidth = background.width;
   // backgroundHeight = background.height;
   // make sure the background is wider and higher than the puzzle
-  backgroundWidth = 1200;
+  backgroundWidth  = 1200;
   backgroundHeight = 1000;
   
   size(backgroundWidth, backgroundHeight, P3D);
@@ -74,6 +78,10 @@ void setup()
   glowMin = 64;
   glowMax = 100;
   glowSpeed = 0.5;
+  
+  shortVibrationDuration  = 250;  // ms
+  mediumVibrationDuration = 500;  // ms
+  longVibrationDuration   = 1000; // ms
   
   font = createFont("soria-font.ttf", 100);
   textFont(font);
@@ -295,4 +303,26 @@ void restartGame(int number)
   fullPictureScale = 1;
   isFading = false;
   fade = 0;
+}
+
+/* Vibration functions */
+
+void giveShortVibration()
+{
+  outputVibration(shortVibrationDuration);
+}
+
+void giveMediumVibration()
+{
+  outputVibration(mediumVibrationDuration);
+}
+
+void giveLongVibration()
+{
+  outputVibration(longVibrationDuration);
+}
+
+void outputVibration(int duration)
+{
+  writeSerial(duration); 
 }

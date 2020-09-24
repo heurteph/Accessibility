@@ -26,6 +26,8 @@ class Selector
     {
       this.currentPos = this.nextPos;
       isTransitioning = false;
+      
+      giveShortVibration();
     }
   }
   

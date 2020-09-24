@@ -43,6 +43,11 @@ class Piece
       this.angle  = stableAngles[next];
       isAnimating = false;
       animationSpeed = baseAnimationSpeed;
+      
+      if(this.angle == 0)
+        giveLongVibration(); // spot on !
+      else
+        giveMediumVibration();
     }
   }
   
