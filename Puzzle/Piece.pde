@@ -31,8 +31,12 @@ class Piece
   {
     this.angle += animationSpeed;
     
-    if(this.angle % 360 >= stableAngles[(this.choice.ordinal() + 1) % CHOICE.values().length])
+    int targetAngle = stableAngles[(this.choice.ordinal() + 1) % CHOICE.values().length];
+    if(targetAngle == 0) targetAngle = 360;
+    
+    if(this.angle >= targetAngle)
     {
+      println("angle : " + angle);
       int next    = (this.choice.ordinal() + 1) % CHOICE.values().length;
       this.choice = CHOICE.values()[next];
       this.angle  = stableAngles[next];

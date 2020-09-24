@@ -13,14 +13,14 @@ boolean isAnimating;
 int animationSpeed;
 
 boolean isTransitioning;
-int transitionSpeed;
+float transitionSpeed;
 float selectionScale;
 
 int glow;
 int glowDir;
 int glowMin;
 int glowMax;
-int glowSpeed;
+float glowSpeed;
 
 boolean victory;
 
@@ -45,15 +45,13 @@ void setup()
   wPiece = width / divHorizontal;
   hPiece = height / divVertical;
   
-  selector = new Selector("images\\selection.png", divHorizontal, divVertical);
-  
-  animationSpeed = 1;
-  transitionSpeed = 1;
+  animationSpeed = 5;
+  transitionSpeed = 0.05;
   selectionScale = 1.2;
   
-  glowMin = 128;
-  glowMax = 156;
-  glowSpeed = 1;
+  glowMin = 64;
+  glowMax = 100;
+  glowSpeed = 0.5;
   
   font = createFont("soria-font.ttf", 100);
   textFont(font);
@@ -116,8 +114,10 @@ void draw()
       
       pushMatrix();
         translate(x + wPiece * 0.5, y + hPiece * 0.5);
+        // black background for rotation
+        fill(0,0,0);
+        rect(-wPiece * 0.5, -hPiece * 0.5, wPiece, hPiece);
         rotate(radians(pieces[index].getAngle()));
-        scale(pieces[index].getScale());
         image(pieces[index].getImage(), 0, 0, wPiece, hPiece);
       popMatrix();
     }
@@ -137,9 +137,22 @@ void draw()
     else
     if(glow > glowMax){ glow = glowMax; glowDir = -glowDir; }
     
+    imageMode(CENTER);
+      
+    pushMatrix();
+        translate((selector.getCurrentPos() % divHorizontal) * wPiece + wPiece * 0.5, (selector.getCurrentPos() / divHorizontal) * hPiece  + hPiece * 0.5);
+        scale(pieces[selector.getCurrentPos()].getScale());
+        rotate(radians(pieces[selector.getCurrentPos()].getAngle()));
+        image(pieces[selector.getCurrentPos()].getImage(), 0, 0, wPiece, hPiece);
+        
+        fill(255,255,255,glow);
+        rect(-wPiece * 0.5, -hPiece * 0.5, wPiece, hPiece);
+    popMatrix();
+    /*
     fill(255,255,255,glow);
     noStroke();
-    rect((selector.getCurrentPos() % divHorizontal) * wPiece, (selector.getCurrentPos() / divHorizontal) * hPiece, wPiece, hPiece);
+    rect((selector.getCurrentPos() % divHorizontal) * wPiece, (selector.getCurrentPos() / divHorizontal) * hPiece, wPiece * selectionScale, hPiece * selectionScale);
+    */
   }
 }
 
@@ -203,6 +216,7 @@ void restartGame(int number)
   isAnimating = false;
   isTransitioning = false;
   selectPuzzle(number);
+  selector = new Selector("images\\selection.png", divHorizontal, divVertical);
   glow = glowMax;
   glowDir = -1;
 }

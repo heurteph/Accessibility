@@ -7,7 +7,7 @@ int joystickY;
 
 void setupSerial()
 {  
-  String portName = Serial.list()[1];
+  String portName = Serial.list()[0];
   port = new Serial(this, portName, 9600);
   
   inputs = readSerial(); // purge data before starting
@@ -26,7 +26,7 @@ String readSerial()
 
 void parseInputs(String data)
 {
-  println("data to be parsed: " + data);
+  //println("data to be parsed: " + data);
   try
   {
       JSONObject json = parseJSONObject(data);
