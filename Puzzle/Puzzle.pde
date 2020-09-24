@@ -8,9 +8,11 @@ PFont font;
 String[] puzzles;
 Piece[] pieces;
 Selector selector;
+PImage[] fullPictures;
 
 boolean isAnimating;
-int animationSpeed;
+float animationSpeed;
+float animationAcceleration;
 
 boolean isTransitioning;
 float transitionSpeed;
@@ -23,6 +25,13 @@ int glowMax;
 float glowSpeed;
 
 boolean victory;
+float fullPictureSpeed;
+float fullPictureMaxScale;
+float fullPictureScale;
+
+boolean isFading;
+float fadingSpeed;
+float fade;
 
 /* Set the screen dimensions */
 void settings()
@@ -46,8 +55,9 @@ void setup()
   hPiece = height / divVertical;
   
   animationSpeed = 5;
+  animationAcceleration = -1;
   transitionSpeed = 0.05;
-  selectionScale = 1.2;
+  selectionScale = 1.15;
   
   glowMin = 64;
   glowMax = 100;
@@ -57,7 +67,14 @@ void setup()
   textFont(font);
   
   puzzles = new String[1];
-  puzzles[0] = "bob_";
+  puzzles[0] = "inprogress_";
+  
+  fullPictures = new PImage[1];
+  fullPictures[0] = loadImage("images\\inprogress.png");
+  fullPictureMaxScale = 1.2;
+  fullPictureSpeed = 0.01;
+  
+  fadingSpeed = 1;
   
   restartGame(0);
 }
@@ -114,11 +131,16 @@ void draw()
       
       pushMatrix();
         translate(x + wPiece * 0.5, y + hPiece * 0.5);
-        // black background for rotation
+        
+        //noStroke();
         fill(0,0,0);
-        rect(-wPiece * 0.5, -hPiece * 0.5, wPiece, hPiece);
+        rect(-wPiece * 0.5, -hPiece * 0.5, wPiece, hPiece); // black background seen when rotating
+        
         rotate(radians(pieces[index].getAngle()));
         image(pieces[index].getImage(), 0, 0, wPiece, hPiece);
+        strokeWeight(10);
+        noFill();
+        rect(-wPiece * 0.5, -hPiece * 0.5, wPiece, hPiece); // outline piece
       popMatrix();
     }
   }
@@ -127,7 +149,7 @@ void draw()
   
   if(hasWon())
   {
-    displayEndMessage();
+    displayVictory();
   }
   else
   {
@@ -143,16 +165,17 @@ void draw()
         translate((selector.getCurrentPos() % divHorizontal) * wPiece + wPiece * 0.5, (selector.getCurrentPos() / divHorizontal) * hPiece  + hPiece * 0.5);
         scale(pieces[selector.getCurrentPos()].getScale());
         rotate(radians(pieces[selector.getCurrentPos()].getAngle()));
+        fill(0,0,0,64);
+        rect(-wPiece * 0.5, -hPiece * 0.5, wPiece * pow(pieces[selector.getCurrentPos()].getScale(), 2), hPiece * pow(pieces[selector.getCurrentPos()].getScale(), 2)); // shadow cast all around the piece
         image(pieces[selector.getCurrentPos()].getImage(), 0, 0, wPiece, hPiece);
         
         fill(255,255,255,glow);
-        rect(-wPiece * 0.5, -hPiece * 0.5, wPiece, hPiece);
+        rect(-wPiece * 0.5, -hPiece * 0.5, wPiece, hPiece); // glowing
+        
+        strokeWeight(10);
+        noFill();
+        rect(-wPiece * 0.5, -hPiece * 0.5, wPiece, hPiece); // outline piece
     popMatrix();
-    /*
-    fill(255,255,255,glow);
-    noStroke();
-    rect((selector.getCurrentPos() % divHorizontal) * wPiece, (selector.getCurrentPos() / divHorizontal) * hPiece, wPiece * selectionScale, hPiece * selectionScale);
-    */
   }
 }
 
@@ -169,6 +192,7 @@ void CheckForVictory()
        return;
   }
   victory = true;
+  isFading = true;
 }
 
 void displayEndMessage()
@@ -181,6 +205,30 @@ void displayEndMessage()
   fill(0,0,0);
   textAlign(CENTER, CENTER); // centre le texte horizontalement et verticalement
   text("Puzzle completed", 0, 0, width, height);  // fonction text avec le texte et 4 coordonnées met le texte dans un rectangle (suis le rectMode)
+}
+
+void displayVictory()
+{
+  if(isFading)
+  {
+    fade = min(fade + fadingSpeed, 255);
+    if (fade >= 255)
+    {
+      fade = 255;
+      isFading = false;
+    }
+  }
+  else
+  {
+    fullPictureScale = min(fullPictureScale + fullPictureSpeed, fullPictureMaxScale);
+  }
+  
+  pushMatrix();
+          translate(width / 2.0, height / 2.0);
+          scale(fullPictureScale);
+          image(fullPictures[1], 0, 0, width, height);
+          tint(255, fade);
+  popMatrix();
 }
 
 void selectPuzzleRandom()
@@ -212,6 +260,8 @@ void selectPuzzle(int number)
 
 void restartGame(int number)
 {
+  // TO DO : Add visual transition
+  
   victory = false;
   isAnimating = false;
   isTransitioning = false;
@@ -219,4 +269,7 @@ void restartGame(int number)
   selector = new Selector("images\\selection.png", divHorizontal, divVertical);
   glow = glowMax;
   glowDir = -1;
+  fullPictureScale = 1;
+  isFading = false;
+  fade = 0;
 }

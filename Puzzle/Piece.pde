@@ -30,6 +30,7 @@ class Piece
   public void rotateAnimation()
   {
     this.angle += animationSpeed;
+    animationSpeed = constrain(animationSpeed + animationAcceleration, 1, 10);
     
     int targetAngle = stableAngles[(this.choice.ordinal() + 1) % CHOICE.values().length];
     if(targetAngle == 0) targetAngle = 360;
