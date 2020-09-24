@@ -7,7 +7,7 @@ int joystickY;
 
 void setupSerial()
 {  
-  String portName = Serial.list()[0];
+  String portName = Serial.list()[1];
   port = new Serial(this, portName, 9600);
   
   inputs = readSerial(); // purge data before starting

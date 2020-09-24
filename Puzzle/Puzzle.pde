@@ -18,6 +18,7 @@ PImage background;
 boolean isAnimating;
 float animationSpeed;
 float animationAcceleration;
+float baseAnimationSpeed;
 
 boolean isTransitioning;
 float transitionSpeed;
@@ -42,14 +43,19 @@ float fade;
 void settings()
 {
   // background = loadImage("images\\background.png");
+  // backgroundWidth = background.width;
+  // backgroundHeight = background.height;
   // make sure the background is wider and higher than the puzzle
-  size(1200, 1000);
+  backgroundWidth = 1200;
+  backgroundHeight = 1000;
+  
+  size(backgroundWidth, backgroundHeight, P3D);
 }
 
 void setup()
 {
   surface.setTitle("Puzzle");
-  //frameRate(1);
+  //frameRate(10);
     
   randomSeed(millis());
   
@@ -59,8 +65,9 @@ void setup()
   divVertical = 3;
   divTotal = divHorizontal * divVertical;
   
-  animationSpeed = 5;
-  animationAcceleration = -1;
+  baseAnimationSpeed = 4;
+  animationSpeed = baseAnimationSpeed;
+  animationAcceleration = 0;
   transitionSpeed = 0.05;
   selectionScale = 1.15;
   
@@ -86,6 +93,7 @@ void setup()
 
 void draw()
 {
+    
   /* Inputs */
   
   getInputs();
@@ -122,6 +130,8 @@ void draw()
   }
   
   /* Display */
+  
+  clear();
   
   for(int i = 0; i < divHorizontal; i++)
   {
@@ -167,11 +177,13 @@ void draw()
     imageMode(CENTER);
       
     pushMatrix();
-        translate(marginWidth + (selector.getCurrentPos() % divHorizontal) * wPiece + wPiece * 0.5, marginHeight + (selector.getCurrentPos() / divHorizontal) * hPiece  + hPiece * 0.5);
+        translate(marginWidth + (selector.getCurrentPos() % divHorizontal) * wPiece + wPiece * 0.5, marginHeight + (selector.getCurrentPos() / divHorizontal) * hPiece  + hPiece * 0.5, 1);
         scale(pieces[selector.getCurrentPos()].getScale());
         rotate(radians(pieces[selector.getCurrentPos()].getAngle()));
-        fill(0,0,0,64);
-        rect(-wPiece * 0.5, -hPiece * 0.5, wPiece * pow(pieces[selector.getCurrentPos()].getScale(), 2), hPiece * pow(pieces[selector.getCurrentPos()].getScale(), 2)); // shadow cast all around the piece
+        //noStroke();
+        //fill(0,0,0,64);
+        //rect(-wPiece * 0.5, -hPiece * 0.5, wPiece * pow(pieces[selector.getCurrentPos()].getScale(), 2), hPiece * pow(pieces[selector.getCurrentPos()].getScale(), 2)); // shadow cast all around the piece
+        //rect(-wPiece * 0.5, -hPiece * 0.5, wPiece * 1.2, hPiece * 1.2); // shadow cast all around the piece
         image(pieces[selector.getCurrentPos()].getImage(), 0, 0, wPiece, hPiece);
         
         fill(255,255,255,glow);
@@ -223,15 +235,13 @@ void displayVictory()
       isFading = false;
     }
   }
-  else
-  {
-    fullPictureScale = min(fullPictureScale + fullPictureSpeed, fullPictureMaxScale);
-  }
+  
+  fullPictureScale = min(fullPictureScale + fullPictureSpeed, fullPictureMaxScale);
   
   pushMatrix();
-          translate(width / 2.0, height / 2.0);
+          translate(width / 2.0, height / 2.0, 2);
           scale(fullPictureScale);
-          image(fullPictures[1], 0, 0, puzzleWidth, puzzleHeight);
+          image(fullPictures[0], 0, 0, puzzleWidth, puzzleHeight);
           tint(255, fade);
   popMatrix();
 }
@@ -270,7 +280,7 @@ void restartGame(int number)
   victory = false;
   isAnimating = false;
   isTransitioning = false;
-  
+  animationSpeed = baseAnimationSpeed;
   selectPuzzle(number);
   puzzleWidth = fullPictures[number].width;
   puzzleHeight = fullPictures[number].height;

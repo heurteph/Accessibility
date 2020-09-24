@@ -17,7 +17,7 @@ class Piece
     int rand    = int(random(0,4));
     this.choice = CHOICE.values()[rand];
     this.angle  = stableAngles[rand];
-    this.scale = 1;
+    this.scale  = 1;
   }
   
   public void rotate()
@@ -42,6 +42,7 @@ class Piece
       this.choice = CHOICE.values()[next];
       this.angle  = stableAngles[next];
       isAnimating = false;
+      animationSpeed = baseAnimationSpeed;
     }
   }
   
