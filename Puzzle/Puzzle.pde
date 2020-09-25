@@ -55,6 +55,7 @@ int longVibrationDuration;
 int extraVibrationDuration;
 
 float downscaleFactors[] = {0.6, 0.8};
+String winningNumber[] = {"2", "4"};
 
 int puzzleNumber;
 
@@ -102,7 +103,7 @@ void setup()
   longVibrationDuration   = 500; // ms
   extraVibrationDuration  = 4000; // ms
   
-  font = createFont("soria-font.ttf", 100);
+  font = createFont("soria-font.ttf", 800);
   textFont(font);
   
   puzzles = new String[2];
@@ -318,6 +319,11 @@ void displayVictory()
             image(fullPictures[puzzleNumber], 0, 0, puzzleWidth, puzzleHeight);
             tint(255, 255 - fade);
     popMatrix();
+    
+    // Display winning number
+    textAlign(CENTER, CENTER);
+    fill(255,0,0);
+    text(winningNumber[puzzleNumber], backgroundWidth / 2, backgroundHeight / 2, 10);
   }
 }
 
