@@ -1,9 +1,10 @@
 #include <Servo.h>
 
-const int pinLocks[] = { A0, A1, A2, A3 };
-const int potentiometerMin = 0;
-const int potentiometerMax = 1024;
-const int potentiometerRange = potentiometerMin - potentiometerMax;
+const int pinLocks[] = { A3, A2, A1, A0 };
+const int potentiometerMins[] = {-50, -25, -50, -50};
+int potentiometerMin = 0; // -50
+int potentiometerMax = 672;
+int potentiometerRange = potentiometerMax - potentiometerMin;
 const int totalValues = 9;
 int code[4];
 
@@ -16,6 +17,12 @@ boolean isCodeFound;
 boolean isOver;
 
 void setup() {
+
+  //const int half = potentiometerRange / totalValues * 0.5;
+  //potentiometerMin = potentiometerMin - half;
+  //potentiometerMax = potentiometerMax + half;
+  //potentiometerRange = potentiometerRange + 2 * half;
+  
   // put your setup code here, to run once:
   pinMode(pinLocks[1], INPUT);
   pinMode(pinLocks[2], INPUT);
@@ -43,12 +50,24 @@ void setup() {
   Serial.begin(9600);
 }
 
-void loop()
+void loopTest()
 {
   testServo();
 }
 
-void loop2() {
+void loop() {
+  
+  Serial.print("(");
+  Serial.print(getCurrentNumberOnLock(0));
+  Serial.print(" ,");
+  Serial.print(getCurrentNumberOnLock(1));
+  Serial.print(" ,");
+  Serial.print(getCurrentNumberOnLock(2));
+  Serial.print(" ,");
+  Serial.print(getCurrentNumberOnLock(3));
+  Serial.print(")");
+  Serial.println();
+  
   // put your main code here, to run repeatedly:
   isCodeFound = true;
   for(int i = 0; i < 4; i++)
@@ -60,10 +79,11 @@ void loop2() {
     }
   }
   
-  delay(1000); // check every 1 second
+  delay(100); // check every 1 second
   
   if(isCodeFound)
   {
+    Serial.println("CODE FOUND");
     for (int angle = 0; angle <= 180; angle++)
     {
       servomotor.write(angle);
@@ -73,19 +93,29 @@ void loop2() {
   }
 
   // button is inside the box, so physically inaccessible, doesn't need if statement
+  /*
   if(digitalRead(pinResetButton))
   {
     resetGame();
   }
+  */
 }
 
 int getCurrentNumberOnLock(int index)
 {
   int x = analogRead(pinLocks[index]);
+  //Serial.println(x);
   
-  for(int i = 0; i < totalValues; i++)
+  for(int i = 1; i <= totalValues; i++)
   {
-    if(x < potentiometerMin + potentiometerRange * (i + 1) / totalValues)
+    /*
+    Serial.print("range : ");
+    Serial.print(potentiometerMin + potentiometerRange * i / (float)totalValues);
+    Serial.print(":");
+    Serial.print(potentiometerMin + potentiometerRange * (i + 1) / (float)totalValues);
+    Serial.println();*/
+    
+    if(x < potentiometerMins[index] + (float)(potentiometerMax - potentiometerMins[index]) * (float)i / (float)totalValues)
       return i;
   }
   Serial.println("Error : couldn't read the number on the lock");

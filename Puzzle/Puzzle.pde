@@ -19,6 +19,8 @@ PImage background_left;
 PImage background_bottom;
 PImage background_right;
 
+PImage foreground;
+
 boolean isAnimating;
 float animationSpeed;
 float animationAcceleration;
@@ -48,7 +50,9 @@ int mediumVibrationDuration;
 int longVibrationDuration;
 int extraVibrationDuration;
 
-float downscaleFactor = 0.5;
+float downscaleFactors[] = {0.5, 0.8};
+
+int puzzleNumber;
 
 /* Set the screen dimensions */
 void settings()
@@ -57,6 +61,7 @@ void settings()
   background_left = loadImage("images\\background_left.jpg");
   background_bottom = loadImage("images\\background_bottom.jpg");
   background_right = loadImage("images\\background_right.jpg");
+  foreground = loadImage("images\\foreground.png");
   // backgroundWidth = background.width;
   // backgroundHeight = background.height;
   // make sure the background is wider and higher than the puzzle
@@ -83,36 +88,39 @@ void setup()
   animationSpeed = baseAnimationSpeed;
   animationAcceleration = 0;
   transitionSpeed = 0.05;
-  selectionScale = 1.15;
+  selectionScale = 1.1;
   
   glowMin = 64;
   glowMax = 100;
   glowSpeed = 0.5;
   
-  shortVibrationDuration  = 250;  // ms
-  mediumVibrationDuration = 500;  // ms
-  longVibrationDuration   = 1000; // ms
+  shortVibrationDuration  = 100;  // ms
+  mediumVibrationDuration = 250;  // ms
+  longVibrationDuration   = 500; // ms
   extraVibrationDuration  = 4000; // ms
   
   font = createFont("soria-font.ttf", 100);
   textFont(font);
   
-  puzzles = new String[1];
+  puzzles = new String[2];
   puzzles[0] = "vitrail_";
+  puzzles[1] = "mucha_";
   
-  fullPictures = new PImage[1];
+  fullPictures = new PImage[2];
   fullPictures[0] = loadImage("images\\vitrail.png");
+  fullPictures[1] = loadImage("images\\mucha.png");
   fullPictureMaxScale = 1.2;
   fullPictureSpeed = 0.01;
   
-  fadingSpeed = 10;
+  fadingSpeed = 15;
   
-  restartGame(0);
+  // puzzleNumber = 1;
+  puzzleNumber = int(random(0,2));
+  restartGame(puzzleNumber);
 }
 
 void draw()
 {
-    
   /* Inputs */
   
   getInputs();
@@ -144,7 +152,8 @@ void draw()
     if(button == 1)
     {
       button = 0;
-      restartGame(0);
+      puzzleNumber = (puzzleNumber + 1) % 2;
+      restartGame(puzzleNumber);
     }
   }
   
@@ -169,6 +178,7 @@ void draw()
       image(background_right, width - marginWidth / 2, height / 2, marginWidth, height);
       
       pushMatrix();
+        strokeWeight(3);
         translate(marginWidth + x + wPiece * 0.5, marginHeight + y + hPiece * 0.5);
         
         //noStroke();
@@ -177,12 +187,14 @@ void draw()
         
         rotate(radians(pieces[index].getAngle()));
         image(pieces[index].getImage(), 0, 0, wPiece, hPiece);
-        strokeWeight(10);
-        //noFill();
-        //rect(-wPiece * 0.5, -hPiece * 0.5, wPiece, hPiece); // outline piece
+        //noStroke();
+        noFill();
+        rect(-wPiece * 0.5, -hPiece * 0.5, wPiece, hPiece); // outline piece
         
         //tint(255, 255 - fade);
       popMatrix();
+      
+      //image(foreground, width/2, height/2, width, height);
     }
   }
   
@@ -203,6 +215,7 @@ void draw()
     imageMode(CENTER);
       
     pushMatrix();
+        //noStroke();
         translate(marginWidth + (selector.getCurrentPos() % divHorizontal) * wPiece + wPiece * 0.5, marginHeight + (selector.getCurrentPos() / divHorizontal) * hPiece  + hPiece * 0.5, 1);
         scale(pieces[selector.getCurrentPos()].getScale());
         rotate(radians(pieces[selector.getCurrentPos()].getAngle()));
@@ -215,7 +228,8 @@ void draw()
         fill(255,255,255,glow);
         rect(-wPiece * 0.5, -hPiece * 0.5, wPiece, hPiece); // glowing
         
-        strokeWeight(10);
+        strokeWeight(6);
+        stroke(0, 255 - fade);
         noFill();
         rect(-wPiece * 0.5, -hPiece * 0.5, wPiece, hPiece); // outline piece
         //tint(255, 255 - fade);
@@ -257,6 +271,7 @@ void displayVictory()
 {
   if(isFading)
   {
+    noStroke();
     fill(255, fade);
     rect(0,0,width,height);
     fade = min(fade + fadingSpeed, 255);
@@ -276,7 +291,7 @@ void displayVictory()
     pushMatrix();
             translate(width / 2.0, height / 2.0, 2);
             //scale(fullPictureScale);
-            image(fullPictures[0], 0, 0, puzzleWidth, puzzleHeight);
+            image(fullPictures[puzzleNumber], 0, 0, puzzleWidth, puzzleHeight);
             tint(255, 255 - fade);
     popMatrix();
   }
@@ -318,8 +333,8 @@ void restartGame(int number)
   isTransitioning = false;
   animationSpeed = baseAnimationSpeed;
   selectPuzzle(number);
-  puzzleWidth = int(fullPictures[number].width * downscaleFactor);
-  puzzleHeight = int(fullPictures[number].height * downscaleFactor);
+  puzzleWidth = int(fullPictures[number].width * downscaleFactors[number]);
+  puzzleHeight = int(fullPictures[number].height * downscaleFactors[number]);
   wPiece = puzzleWidth / divHorizontal;
   hPiece = puzzleHeight / divVertical;
   marginWidth = (backgroundWidth - puzzleWidth) / 2;
