@@ -6,13 +6,20 @@ int joystickX;
 int joystickY;
 
 void setupSerial()
-{  
-  String portName = Serial.list()[1];
-  port = new Serial(this, portName, 9600);
-  
-  inputs = readSerial(); // purge data before starting
-  inputs = readSerial(); // purge data before starting
-  inputs = readSerial(); // purge data before starting
+{
+  try
+  {
+    String portName = Serial.list()[1];
+    port = new Serial(this, portName, 9600);
+    
+    inputs = readSerial(); // purge data before starting
+    inputs = readSerial(); // purge data before starting
+    inputs = readSerial(); // purge data before starting
+  }
+  catch(Exception e)
+  {
+    
+  }
 }
 
 void writeSerial(int value)
@@ -22,7 +29,7 @@ void writeSerial(int value)
 
 String readSerial()
 {
-  if(port.available() > 0) 
+  if(port != null && port.available() > 0) 
   {
     return trim(port.readStringUntil('\n'));
   }

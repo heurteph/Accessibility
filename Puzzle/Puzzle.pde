@@ -1,8 +1,11 @@
+import java.util.*;
+
 int puzzleWidth, puzzleHeight;
 int divHorizontal, divVertical, divTotal;
 int wPiece, hPiece;
 int backgroundWidth, backgroundHeight;
 int marginWidth, marginHeight;
+int offsetWidth, offsetHeight;
 
 String path, extension;
 String inputs;
@@ -14,6 +17,7 @@ Piece[] pieces;
 Selector selector;
 PImage[] fullPictures;
 
+PImage background_img;
 PImage background_top;
 PImage background_left;
 PImage background_bottom;
@@ -50,23 +54,21 @@ int mediumVibrationDuration;
 int longVibrationDuration;
 int extraVibrationDuration;
 
-float downscaleFactors[] = {0.5, 0.8};
+float downscaleFactors[] = {0.6, 0.8};
 
 int puzzleNumber;
 
 /* Set the screen dimensions */
 void settings()
 {
-  background_top = loadImage("images\\background_top.jpg");
-  background_left = loadImage("images\\background_left.jpg");
-  background_bottom = loadImage("images\\background_bottom.jpg");
-  background_right = loadImage("images\\background_right.jpg");
-  foreground = loadImage("images\\foreground.png");
+  //fullScreen();
   // backgroundWidth = background.width;
   // backgroundHeight = background.height;
   // make sure the background is wider and higher than the puzzle
-  backgroundWidth  = 1250;
-  backgroundHeight = 1000;
+  //backgroundWidth  = 1250;
+  //backgroundHeight = 1000;
+  backgroundWidth  = 1920;
+  backgroundHeight = 1200;
   
   size(backgroundWidth, backgroundHeight, P3D);
 }
@@ -75,8 +77,9 @@ void setup()
 {
   surface.setTitle("Puzzle");
   //frameRate(10);
-    
-  randomSeed(millis());
+  
+  Date d = new Date();
+  randomSeed(d.getTime());
   
   setupSerial();
   
@@ -111,6 +114,13 @@ void setup()
   fullPictures[1] = loadImage("images\\mucha.png");
   fullPictureMaxScale = 1.2;
   fullPictureSpeed = 0.01;
+  
+  background_img = loadImage("images\\background2.jpg");
+  background_top = loadImage("images\\background2_top.jpg");
+  background_left = loadImage("images\\background2_left.jpg");
+  background_bottom = loadImage("images\\background2_bottom.jpg");
+  background_right = loadImage("images\\background2_right.jpg");
+  //foreground = loadImage("images\\foreground.png");
   
   fadingSpeed = 15;
   
@@ -161,6 +171,8 @@ void draw()
   
   clear();
   
+  //background(background_img);
+  
   for(int i = 0; i < divHorizontal; i++)
   {
     for(int j = 0; j < divVertical; j++)
@@ -170,16 +182,28 @@ void draw()
       
       int index = j * divHorizontal + i;
 
+     imageMode(CORNER);
+      
+     pushMatrix();
+        translate(0, 0, -5); // behind the puzzle
+        fill(238,207,160);
+        rect(0,0,width,height);
+        image(background_top, 0, 0);
+        image(background_left, 0, 0);
+        image(background_right, backgroundWidth - marginWidth, 0);
+        image(background_bottom, 0, backgroundHeight - marginHeight);
+      popMatrix();
+
       imageMode(CENTER);
       
-      image(background_top,    width / 2, marginHeight / 2, width, marginHeight);
-      image(background_bottom, width / 2, height - marginHeight / 2, width, marginHeight);
-      image(background_left, marginWidth / 2, height / 2, marginWidth, height);
-      image(background_right, width - marginWidth / 2, height / 2, marginWidth, height);
+      // image(background_top,    width / 2, marginHeight / 2, width, marginHeight);
+      // image(background_bottom, width / 2, height - marginHeight / 2, width, marginHeight);
+      // image(background_left, marginWidth / 2, height / 2, marginWidth, height);
+      // image(background_right, width - marginWidth / 2, height / 2, marginWidth, height);
       
       pushMatrix();
         strokeWeight(3);
-        translate(marginWidth + x + wPiece * 0.5, marginHeight + y + hPiece * 0.5);
+        translate(offsetWidth + x + wPiece * 0.5, offsetHeight + y + hPiece * 0.5);
         
         //noStroke();
         fill(0,0,0);
@@ -216,7 +240,7 @@ void draw()
       
     pushMatrix();
         //noStroke();
-        translate(marginWidth + (selector.getCurrentPos() % divHorizontal) * wPiece + wPiece * 0.5, marginHeight + (selector.getCurrentPos() / divHorizontal) * hPiece  + hPiece * 0.5, 1);
+        translate(offsetWidth + (selector.getCurrentPos() % divHorizontal) * wPiece + wPiece * 0.5, offsetHeight + (selector.getCurrentPos() / divHorizontal) * hPiece + hPiece * 0.5, 1);
         scale(pieces[selector.getCurrentPos()].getScale());
         rotate(radians(pieces[selector.getCurrentPos()].getAngle()));
         //noStroke();
@@ -333,12 +357,14 @@ void restartGame(int number)
   isTransitioning = false;
   animationSpeed = baseAnimationSpeed;
   selectPuzzle(number);
-  puzzleWidth = int(fullPictures[number].width * downscaleFactors[number]);
+  puzzleWidth  = int(fullPictures[number].width  * downscaleFactors[number]);
   puzzleHeight = int(fullPictures[number].height * downscaleFactors[number]);
   wPiece = puzzleWidth / divHorizontal;
   hPiece = puzzleHeight / divVertical;
-  marginWidth = (backgroundWidth - puzzleWidth) / 2;
-  marginHeight = (backgroundHeight - puzzleHeight) / 2;
+  offsetWidth = (backgroundWidth - puzzleWidth) / 2;
+  offsetHeight = (backgroundHeight - puzzleHeight) / 2;
+  marginWidth = 210;
+  marginHeight = 197;
   
   selector = new Selector("images\\selection.png", divHorizontal, divVertical);
   glow = glowMax;
