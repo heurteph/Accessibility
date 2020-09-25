@@ -6,6 +6,7 @@ const int joystickUpPin    = 5;
 
 const int vibrationPin     = 9;
 unsigned long vibrationTimer = 0;
+boolean useVibration = false;
 
 /* button vars */
 
@@ -23,29 +24,30 @@ unsigned long joystickDelay = 500; // milliseconds
 unsigned long lastMillis;
 
 void setup() {
-  
+
   pinMode(buttonPin, INPUT_PULLUP);
   pinMode(joystickUpPin, INPUT);
   pinMode(joystickDownPin, INPUT);
   pinMode(joystickLeftPin, INPUT);
   pinMode(joystickRightPin, INPUT);
-  pinMode(vibrationPin, OUTPUT);
+  if(useVibration)
+    pinMode(vibrationPin, OUTPUT);
 
   lastMillis = millis();
-  
+
   Serial.begin(9600);
 }
 
 void loop() {
 
   /* Button */
-  
+
   int buttonState = digitalRead(buttonPin); // MEMO : 1 is released, 0 is pressed
 
   int buttonTrigger = 0;
-  if(buttonState == LOW)
+  if (buttonState == LOW)
   {
-    if(lastButtonState == RELEASED)
+    if (lastButtonState == RELEASED)
     {
       buttonTrigger = 1;
     }
@@ -60,24 +62,24 @@ void loop() {
 
   xJoystickTrigger = 0;
   yJoystickTrigger = 0;
-  if(millis() - joystickTimer > joystickDelay)
-  {  
-    if(digitalRead(joystickUpPin) == LOW)
+  if (millis() - joystickTimer > joystickDelay)
+  {
+    if (digitalRead(joystickUpPin) == LOW)
     {
       yJoystickTrigger = 1;
       joystickTimer = millis();
     }
-    if(digitalRead(joystickDownPin) == LOW)
+    if (digitalRead(joystickDownPin) == LOW)
     {
       yJoystickTrigger = -1;
       joystickTimer = millis();
     }
-    if(digitalRead(joystickLeftPin) == LOW)
+    if (digitalRead(joystickLeftPin) == LOW)
     {
       xJoystickTrigger = -1;
       joystickTimer = millis();
     }
-    if(digitalRead(joystickRightPin) == LOW)
+    if (digitalRead(joystickRightPin) == LOW)
     {
       xJoystickTrigger = 1;
       joystickTimer = millis();
@@ -86,24 +88,27 @@ void loop() {
 
   /* vibrations */
 
-  if(vibrationTimer > 0)
+  if(useVibration)
   {
-    vibrationTimer = max(vibrationTimer - (millis() - lastMillis), 0);
-    if(vibrationTimer <= 0)
-      digitalWrite(vibrationPin, LOW);
+    if (vibrationTimer > 0)
+    {
+      vibrationTimer = max(vibrationTimer - (millis() - lastMillis), 0);
+      if (vibrationTimer <= 0)
+        digitalWrite(vibrationPin, LOW);
+      else
+        digitalWrite(vibrationPin, HIGH);
+    }
     else
-      digitalWrite(vibrationPin, HIGH);
-  }
-  else
-  {
+    {
       int t = Serial.parseInt(); // receive duration from Processing, do not load them during occuring vibration
-      if(t != 0)
+      if (t != 0)
       {
         vibrationTimer = t;
       }
+    }
+    lastMillis = millis();
   }
-  lastMillis = millis();
-  
+
   String s1 = "{\"joystickX\": ";
   String s2 = (String)xJoystickTrigger;
   String s3 = ",\"joystickY\": ";
@@ -112,6 +117,6 @@ void loop() {
   String s6 = (String)buttonTrigger;
   String s7 = "}\n";
   String msg = s1 + s2 + s3 + s4 + s5 + s6 + s7;
-  
+
   Serial.println(msg);
 }
